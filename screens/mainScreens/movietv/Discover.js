@@ -323,28 +323,36 @@ const Discover = ({navigation}) => {
     };
     //trending
     const fetchTrending = async () => {
-        const response = await fetch(`${overserrUrl}/api/v1/discover/trending?page=1&language=en`, {
-            headers: {
-                'X-Api-Key': `${overseerrApi}`,
-            },
-        });
-        const data = await response.json();
-        //console.log(data);
-        const trending = await Promise.all(data.results.map(request => fetchMediaDetails(request, tmdbApiKey)));
+        let trending = [];
+        for(let i = 1; i <= 10; i++) {
+            const response = await fetch(`${overserrUrl}/api/v1/discover/trending?page=${i}&language=en`, {
+                headers: {
+                    'X-Api-Key': `${overseerrApi}`,
+                },
+            });
+            const data = await response.json();
+            const pageTrending = await Promise.all(data.results.map(request => fetchMediaDetails(request, tmdbApiKey)));
+            trending = [...trending, ...pageTrending];
+        }
         setTrending(trending);
     };
+
     //Fetch the popular movies
     const fetchPopularMovies = async () => {
-        const response = await fetch(`${overserrUrl}/api/v1/discover/movies?page=1&sortBy=popularity.desc`, {
-            headers: {
-                'X-Api-Key': `${overseerrApi}`,
-            },
-        });
-        const data = await response.json();
-        //console.log(data);
-        const popularMovies = await Promise.all(data.results.map(popularMovie => fetchMediaDetails(popularMovie, tmdbApiKey)));
+        let popularMovies = [];
+        for(let i = 1; i <= 10; i++) {
+            const response = await fetch(`${overserrUrl}/api/v1/discover/movies?page=${i}&sortBy=popularity.desc`, {
+                headers: {
+                    'X-Api-Key': `${overseerrApi}`,
+                },
+            });
+            const data = await response.json();
+            const pagePopularMovies = await Promise.all(data.results.map(popularMovie => fetchMediaDetails(popularMovie, tmdbApiKey)));
+            popularMovies = [...popularMovies, ...pagePopularMovies];
+        }
         setPopularMovies(popularMovies);
     };
+
     //Fetch the popular tv
     const fetchPopularTV = async () => {
         let tvSet = new Set();
@@ -406,7 +414,7 @@ const Discover = ({navigation}) => {
     //Fetch the upcoming movies
     const fetchUpcomingMovies = async () => {
         let allMovies = [];
-        for (let i = 1; i <= 2; i++) {
+        for (let i = 1; i <= 5; i++) {
             const response = await fetch(`${overserrUrl}/api/v1/discover/movies/upcoming?page=${i}`, {
                 headers: {
                     'X-Api-Key': `${overseerrApi}`,
@@ -420,17 +428,20 @@ const Discover = ({navigation}) => {
     };
     //Fetch the upcoming tv
     const fetchUpcomingTV = async () => {
-        const response = await fetch(`${overserrUrl}/api/v1/discover/tv/upcoming?page=1`, {
-            headers: {
-                'X-Api-Key': `${overseerrApi}`,
-            },
-        });
-        const data = await response.json();
-        const upcomingTV = await Promise.all(data.results.map(upcomingTV => fetchMediaDetails(upcomingTV, tmdbApiKey)));
-
+        let upcomingTV = [];
+        for(let i = 1; i <= 5; i++) {
+            const response = await fetch(`${overserrUrl}/api/v1/discover/tv/upcoming?page=${i}`, {
+                headers: {
+                    'X-Api-Key': `${overseerrApi}`,
+                },
+            });
+            const data = await response.json();
+            const pageUpcomingTV = await Promise.all(data.results.map(upcomingTV => fetchMediaDetails(upcomingTV, tmdbApiKey)));
+            upcomingTV = [...upcomingTV, ...pageUpcomingTV];
+        }
         setUpcomingTV(upcomingTV);
-
     };
+
     //Fetch the studios
     const fetchStudios = async () => {
         let fetchedStudios = [];
