@@ -1,10 +1,14 @@
 import React, {Fragment, useContext, useEffect, useRef, useState} from 'react';
 import {
-    ActivityIndicator, Alert, FlatList, Linking,
+    ActivityIndicator,
+    Alert,
+    FlatList,
+    Linking,
     Modal,
     Platform,
     ScrollView,
-    StyleSheet, Switch,
+    StyleSheet,
+    Switch,
     Text,
     ToastAndroid,
     TouchableOpacity,
@@ -113,10 +117,6 @@ const MediaDetailsScreen = ({ route, navigation }) => {
     const modal = () => {
         setModalVisible(true);
     };
-    const modalIssue = () => {
-        setModalVisibleIssue(true);
-    }
-
     function handleToggle(season) {
         // Toggle the isEnabled property of the season
         season.isEnabled = !season.isEnabled;
@@ -160,9 +160,7 @@ const MediaDetailsScreen = ({ route, navigation }) => {
                     }
                 }).catch(error => console.error('Error during fetch:', error));
 
-                const episodeData = await episodeResponse.json().catch(error => console.error('Error during JSON parsing:', error));
-
-                seasonData[0].seasons[i].episodes = episodeData;
+                seasonData[0].seasons[i].episodes = await episodeResponse.json().catch(error => console.error('Error during JSON parsing:', error));
             }
 
             // Update the detailsSeasons state with the new seasons and episodes data
@@ -274,8 +272,7 @@ const MediaDetailsScreen = ({ route, navigation }) => {
                 'X-Api-Key': overseerrApi
             }
         });
-        const seasonDetails = await response.json();
-        return seasonDetails;
+        return await response.json();
     };
 
     useEffect(() => {
@@ -1143,10 +1140,22 @@ const MediaDetailsScreen = ({ route, navigation }) => {
                                 key={index}
                                 style={styles.castCard}
                             >
+                                {castMember.profilePath ? (
                                 <Image
                                     source={{ uri: `https://image.tmdb.org/t/p/w500${castMember.profilePath}` }}
                                     style={styles.castImage}
                                 />
+
+                                ) : (
+                                    <ImageBackground
+
+                                        source={require('../../../assets/icon.png')}
+                                        style={styles.castImage}
+                                        contentFit={'cover'}
+                                        imageStyle={{ borderRadius: 100}}
+                                    >
+                                    </ImageBackground>
+                                )}
                                 <Text numberOfLines={1} style={styles.castName}>{castMember.name}</Text>
                                 <Text numberOfLines={1} style={styles.castCharacter}>{castMember.character}</Text>
                             </TouchableOpacity>
@@ -1367,7 +1376,7 @@ const MediaDetailsScreen = ({ route, navigation }) => {
         <BottomSheetModal
             ref={trailerModalRef}
             index={0}
-            snapPoints={['30%']}
+            snapPoints={['35%']}
             backgroundComponent={CustomBackground}
             style={styles.youtubeBottomSheetStyle}
             enablePanDownToClose={true}
@@ -1493,23 +1502,6 @@ const MediaDetailsScreen = ({ route, navigation }) => {
                                 )}
                             </View>
                         )}
-                    </View>
-                </View>
-                <View style={styles.containerSectionManage} >
-                    <Text style={styles.manageDetailsSubTitle}>Advanced</Text>
-                    <View>
-                        <TouchableOpacity
-                            onPress={() => { manageMedia();}}
-                            style={styles.manageButton}
-                        >
-                            <Text style={styles.detailsTitleManage}>Mark As Available</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                            onPress={() => { manageMedia();}}
-                            style={styles.manageButton}
-                        >
-                            <Text style={styles.detailsTitleManage}>Clear Data</Text>
-                        </TouchableOpacity>
                     </View>
                 </View>
             </View>
@@ -1889,6 +1881,7 @@ const styles = StyleSheet.create({
         },
         castContainer: {
             flexDirection: 'row',
+            marginBottom: 40,
         },
         castCard: {
             height: 240,
@@ -2232,6 +2225,7 @@ const styles = StyleSheet.create({
         borderTopRightRadius: 20,
         paddingHorizontal: 10,
         paddingVertical: 20,
+        marginBottom:20
     },
     youtubeBottomSheetStyle : {
         backgroundColor: '#161f2e',
